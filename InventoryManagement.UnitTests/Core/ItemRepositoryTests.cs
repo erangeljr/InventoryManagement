@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using InventoryManagement.Core.Entities;
 using InventoryManagment.Core.Persistence;
 using Moq;
@@ -10,13 +11,26 @@ namespace InventoryManagement.UnitTests.Core
 {
     public class when_working_with_the_item_type_repository : Specification
     {
+        protected Mock<ISessionFactory>  _mockSessionFactory;
+        protected Mock<ISession>  _mockSession;
+        protected IItemTypeRepository _itemTypeRepository;
+
+        protected override void Establish_context()
+        {
+            base.Establish_context();
+            _mockSession = new Mock<ISession>();
+            _mockSessionFactory = new Mock<ISessionFactory>();
+            _itemTypeRepository = new ItemTypeRepository(_mockSessionFactory.Object);
+
+            _mockSessionFactory.Setup(sf => sf.OpenSession()).Returns(_mockSession.Object);
+        }
 
     }
 
     public class and_saving_a_valid_item_type : when_working_with_the_item_type_repository
     {
         private int _result;
-        private IItemTypeRepository _itemTypeRepository;
+ 
         private ItemType _testItemType;
         private int _itemTypeId;
 
@@ -24,15 +38,11 @@ namespace InventoryManagement.UnitTests.Core
         {
             base.Establish_context();
             var randomNumber = new Random();
-            var mockSessionFactory = new Mock<ISessionFactory>();
-            var mockSession = new Mock<ISession>();
-
-           
 
             _itemTypeId = randomNumber.Next(32000);
-            mockSessionFactory.Setup(sf => sf.OpenSession()).Returns(mockSession.Object);
-            mockSession.Setup(s => s.Save(_testItemType)).Returns(_itemTypeId);
-            _itemTypeRepository = new ItemTypeRepository(mockSessionFactory.Object);
+
+            _mockSession.Setup(s => s.Save(_testItemType)).Returns(_itemTypeId);
+           
         }
         protected override void Because_of()
         {
@@ -46,4 +56,29 @@ namespace InventoryManagement.UnitTests.Core
         }
     }
 
+    public class and_saving_an_invalid_item_type : when_working_with_the_item_type_repository
+    {
+        private Exception _result;
+
+        public void then_an_argumnet_null_exception_should_be_raised()
+        {
+            _result.ShouldBeInstanceOfType(typeof(ArgumentNullException));
+        }
+
+        protected override void Because_of()
+        {
+            try
+            {
+              _itemTypeRepository.Save(null);
+
+            }
+            catch (Exception exception)
+            {
+                
+                  _result = exception;
+            }
+           
+        }
+
+    }
 }
