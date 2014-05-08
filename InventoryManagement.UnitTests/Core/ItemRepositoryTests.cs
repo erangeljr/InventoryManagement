@@ -25,8 +25,13 @@ namespace InventoryManagement.UnitTests.Core
             base.Establish_context();
             var randomNumber = new Random();
             var mockSessionFactory = new Mock<ISessionFactory>();
+            var mockSession = new Mock<ISession>();
+
+           
 
             _itemTypeId = randomNumber.Next(32000);
+            mockSessionFactory.Setup(sf => sf.OpenSession()).Returns(mockSession.Object);
+            mockSession.Setup(s => s.Save(_testItemType)).Returns(_itemTypeId);
             _itemTypeRepository = new ItemTypeRepository(mockSessionFactory.Object);
         }
         protected override void Because_of()
