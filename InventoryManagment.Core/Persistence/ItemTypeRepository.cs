@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using InventoryManagement.Core.Entities;
+﻿using InventoryManagement.Core.Entities;
+using NHibernate;
 
 namespace InventoryManagment.Core.Persistence
 {
@@ -16,9 +11,24 @@ namespace InventoryManagment.Core.Persistence
 
     public class ItemTypeRepository : IItemTypeRepository
     {
+        private ISessionFactory _sessionFactory;
+
+        public ItemTypeRepository(ISessionFactory sessionFactory)
+        {
+            _sessionFactory = sessionFactory;
+        }
+
         public int Save(ItemType item)
         {
-            return 1;
+            int Id;
+
+            using (var session = _sessionFactory.OpenSession())
+            {
+                Id = (int)session.Save(item);
+                session.Flush();
+            }
+
+            return Id;
         }
     }
 }

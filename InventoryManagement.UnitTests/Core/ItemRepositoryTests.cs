@@ -1,8 +1,10 @@
 ﻿using System;
 using InventoryManagement.Core.Entities;
 using InventoryManagment.Core.Persistence;
+using Moq;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
+using NHibernate;
 
 namespace InventoryManagement.UnitTests.Core
 {
@@ -22,8 +24,10 @@ namespace InventoryManagement.UnitTests.Core
         {
             base.Establish_context();
             var randomNumber = new Random();
+            var mockSessionFactory = new Mock<ISessionFactory>();
+
             _itemTypeId = randomNumber.Next(32000);
-            _itemTypeRepository = new ItemTypeRepository();
+            _itemTypeRepository = new ItemTypeRepository(mockSessionFactory.Object);
         }
         protected override void Because_of()
         {
