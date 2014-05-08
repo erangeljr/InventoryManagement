@@ -60,6 +60,7 @@ namespace InventoryManagement.UnitTests.Core
     {
         private Exception _result;
 
+        [Test]
         public void then_an_argumnet_null_exception_should_be_raised()
         {
             _result.ShouldBeInstanceOfType(typeof(ArgumentNullException));
@@ -80,5 +81,10 @@ namespace InventoryManagement.UnitTests.Core
            
         }
 
+        protected override void Establish_context()
+        {
+            base.Establish_context();
+            _mockSession.Setup(s => s.Save(null)).Throws(new ArgumentNullException());
+        }
     }
 }
