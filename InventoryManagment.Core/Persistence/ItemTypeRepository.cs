@@ -30,5 +30,14 @@ namespace InventoryManagment.Core.Persistence
 
             return Id;
         }
+
+        public ItemType GetItemById(int Id)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            {
+                return session.Get<ItemType>(Id);
+            }
+
+        }
     }
 }
